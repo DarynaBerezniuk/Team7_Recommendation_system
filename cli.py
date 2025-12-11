@@ -1,3 +1,4 @@
+import os
 import argparse
 import pagerank_calculation as pg
 
@@ -7,9 +8,12 @@ subparsers = parser.add_subparsers(dest="command", required=True)
 parser_calc_pg = subparsers.add_parser('calc')
 parser_calc_pg.add_argument('--p', action='store_true')
 parser_calc_pg.add_argument('--l', type=str)
+parser_calc_pg.add_argument('--w', action='store_true')
+
+parser_calc_pg = subparsers.add_parser('run')
 args = parser.parse_args()
 
-def calc_pg(file_likes='Likes.ini', liked=None):
+def calc_pg(file_likes=r'data\likes.ini', liked=None, write=False):
     likes = pg.graph_creation(file_likes)
     users = pg.get_all_users(likes)
     matrix = pg.create_transition_matrix(likes, users)
@@ -40,12 +44,19 @@ def calc_pg(file_likes='Likes.ini', liked=None):
         asked_users=asked_users,
     )
 
-    for (name, score) in recommendations:
-        print(f"{name}\t{score:.4f}")
+    if write is True:
+        pg.write_pagerank_in_file(recommendations)
+    else:
+        for (name, score) in recommendations:
+            print(f"{name}\t{score:.4f}")
 
 if args.command == 'calc':
 
-    if args.p:
-        print('hey')
-    else:
+    if args.l and args.w:
+        calc_pg(liked=args.l, write=args.w)
+    elif args.l:
         calc_pg(liked=args.l)
+    else:
+        calc_pg()
+elif args.command == 'run':
+    os.system('streamlit run app.py')
