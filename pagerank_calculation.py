@@ -9,6 +9,16 @@ import numpy as np
 def reading_file_people(file_name: str) -> dict[str: list[str]]:
     """
     Функція зчитує файл і виводить словник, де ключ - ім'я людини, а значення - стать і хобі
+
+    >>> _ = open("people_test.txt", "w", encoding="utf-8").write(
+    ...     "name_1\\tF\\tМузика\\tПодорожі\\n"
+    ...     "name_2\\tM\\tРок\\tХіп-хоп\\n"
+    ... )
+    >>> data = reading_file_people("people_test.txt")
+    >>> data["name_1"]
+    ['F', 'Музика', 'Подорожі']
+    >>> data["name_2"]
+    ['M', 'Рок', 'Хіп-хоп']
     """
     result_dict = {}
     with open(file_name, 'r', encoding='utf-8') as file:
@@ -31,6 +41,13 @@ def graph_creation(file_name: str) -> dict:
         "name_1": {"name_3", ...},
         ...
     }
+
+    >>> _ = open("likes_test.ini", "w", encoding="utf-8").write(
+    ...     "(alice, bob)  # Спільний інтерес: Тест\\n"
+    ...     "(alice, carol)  # Спільний інтерес: Тест\\n"
+    ... )
+    >>> graph_creation("likes_test.ini") == {"alice": {"bob", "carol"}}
+    True
     """
     result_dict = {}
     with open(file_name, 'r', encoding='utf-8') as file:
@@ -52,6 +69,10 @@ def graph_creation(file_name: str) -> dict:
 def get_all_users(likes: dict[str, set[str]]) -> list[str]:
     """
     Створює відсортований список усіх унікальних користувачів з графа.
+
+    >>> likes = {"a": {"b", "c"}, "d": {"a"}}
+    >>> get_all_users(likes)
+    ['a', 'b', 'c', 'd']
     """
     users = set(likes.keys())
     for liked_set in likes.values():
@@ -64,6 +85,14 @@ def create_transition_matrix(likes: dict, users: list) -> np.ndarray:
     """
     Будує матрицю переходів M (транспоновану), де
     M[j, i] = ймовірність перейти з i до j.
+
+    >>> likes = {"a": {"b"}, "b": {"a"}}
+    >>> users = get_all_users(likes)
+    >>> M = create_transition_matrix(likes, users)
+    >>> M.shape
+    (2, 2)
+    >>> bool({tuple(row) for row in M} == {(0.0, 1.0), (1.0, 0.0)})
+    True
     """
     num_users = len(users)
     matrix = np.zeros((num_users, num_users))
@@ -95,6 +124,16 @@ def calculate_pagerank(
     який слугує мірою відносної важливості кожного вузла в графі,
     представленому вхідною матрицею.
 
+    Для простого симетричного графа a <-> b важливість вершин майже однакова:
+
+    >>> likes = {"a": {"b"}, "b": {"a"}}
+    >>> users = get_all_users(likes)
+    >>> M = create_transition_matrix(likes, users)
+    >>> pr = calculate_pagerank(M, len(users), max_iterations=50)
+    >>> round(float(pr.sum()), 5)
+    1.0
+    >>> bool(abs(float(pr[0] - pr[1])) < 1e-6)
+    True
     """
     vector = np.ones(num_users) / num_users
     vector_teleport = np.ones(num_users) * (1 - alpha) / num_users
@@ -121,6 +160,21 @@ def build_personalization_vector(
     Ця функція призначена для створення персоналізованого вектора розподілу ймовірностей
     (або вектора телепортації) на основі вподобань і соціальних зв'язків поточного
     користувача в системі рекомендацій чи алгоритмі PageRank з персоналізацією.
+
+    Якщо немає жодних уподобань, вектор рівномірний:
+
+    >>> users = ["u1", "u2", "u3"]
+    >>> k = build_personalization_vector(users, [], [], [])
+    >>> [round(float(x), 3) for x in k]
+    [0.333, 0.333, 0.333]
+
+    Якщо є вподобання, улюблені користувачі мають більшу вагу:
+
+    >>> k2 = build_personalization_vector(users, ["u1"], ["u3"], [])
+    >>> round(float(k2.sum()), 6) == 1.0
+    True
+    >>> bool(k2[0] > k2[1] > k2[2])
+    True
     """
     num_users = len(users)
     scores = np.zeros(num_users)
@@ -172,6 +226,19 @@ def calculate_personalized_pagerank(
     """
     Функція обчислює Персоналізований PageRank
     PR_{t+1} = α * M @ PR_t  +  (1 - α) * k
+
+    Для однакового графа, але різної персоналізації
+    розподіл буде відрізнятися:
+
+    >>> likes = {"a": {"b"}, "b": {"a"}}
+    >>> users = get_all_users(likes)
+    >>> M = create_transition_matrix(likes, users)
+    >>> k1 = build_personalization_vector(users, ["a"], [], [])
+    >>> k2 = build_personalization_vector(users, ["b"], [], [])
+    >>> pr1 = calculate_personalized_pagerank(M, k1, max_iterations=100)
+    >>> pr2 = calculate_personalized_pagerank(M, k2, max_iterations=100)
+    >>> bool(pr1[0] > pr1[1] and pr2[1] > pr2[0])
+    True
     """
     num_users = len(personalization)
 
@@ -199,7 +266,23 @@ def generate_recommendations(
     asked_users: list[str] | None = None,
 ) -> list[tuple[str, float]]:
     """
-    1
+    Фільтрує та сортує користувачів за значенням PageRank, виключаючи:
+    - поточного користувача
+    - уже лайкнутих
+    - дизлайкнутих
+    - тих, кого вже питали
+
+    >>> users = ["u1", "u2", "u3", "u4"]
+    >>> pr = np.array([0.4, 0.3, 0.2, 0.1])
+    >>> reccom = generate_recommendations(
+    ...     users, pr,
+    ...     current_user="u1",
+    ...     liked_users=["u2"],
+    ...     disliked_users=["u3"],
+    ...     asked_users=[]
+    ... )
+    >>> reccom
+    [('u4', 0.1)]
     """
     if liked_users is None:
         liked_users = []
@@ -240,6 +323,14 @@ def build_clan_from_likes(
     """
     Кінцевий результат є списком рекомендованих користувачів,
     які знаходяться на відстані двох кроків від поточного користувача в графі вподобань.
+
+    >>> likes = {
+    ...     "a": {"b", "c"},
+    ...     "b": {"d"},
+    ...     "x": {"a"},
+    ... }
+    >>> build_clan_from_likes(likes, ["a"], [])
+    ['b', 'c', 'x']
     """
     clan_set: set[str] = set()
 
@@ -262,7 +353,16 @@ def build_clan_from_likes(
 
 def extend_disliked_with_neighbors(likes, disliked_users):
     """
-    1
+    Розширює список дизлайкнутих користувачів їхніми безпосередніми сусідами
+    (тих, кого вони лайкають, і тих, хто лайкає їх).
+
+    >>> likes = {
+    ...     "a": {"b"},
+    ...     "b": {"c"},
+    ...     "d": {"a"},
+    ... }
+    >>> sorted(extend_disliked_with_neighbors(likes, ["b"]))
+    ['a', 'b', 'c']
     """
     extended: set[str] = set(disliked_users)
 
@@ -278,7 +378,13 @@ def extend_disliked_with_neighbors(likes, disliked_users):
 
 def suggest_people(user_name, file_name:str) -> dict:
     """
-    Виводить стать та вподобання людини
+    Виводить профіль людини (стать і хобі) у форматованому рядку.
+
+    >>> _ = open("hobbies_test.ini", "w", encoding="utf-8").write(
+    ...     "name_1\\tF\\tМузика\\tПодорожі\\n"
+    ... )
+    >>> suggest_people("name_1", "hobbies_test.ini")
+    'Профіль: name_1, стать : F, хобі: Музика, Подорожі'
     """
     dict_people = reading_file_people(file_name)
     people = dict_people[user_name]
@@ -290,7 +396,7 @@ def suggest_people(user_name, file_name:str) -> dict:
 def write_pagerank_in_file(recommendations: list[tuple[str, float]]):
     """
     Динамічно записує значення PageRank для кожного кандидата у файл result.txt
-    
+
     Аргументи:
         recommendations list[tuple[str, float]]: список з кортежів,
                                                  які репрезентують ім'я та
@@ -305,7 +411,8 @@ def write_pagerank_in_file(recommendations: list[tuple[str, float]]):
 
 def main(file_likes: str):
     """
-    main func
+    Основна функція, яка динамічно розраховує значення PageRank для користувача
+    на основі лайкнутих та дизлайкнутих людей
     """
     likes = graph_creation(file_likes)
     users = get_all_users(likes)
@@ -403,4 +510,6 @@ def main(file_likes: str):
 
 
 if __name__ == "__main__":
+    import doctest
+    print(doctest.testmod())
     main(r"data\likes.ini")
