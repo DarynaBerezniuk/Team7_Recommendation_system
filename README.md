@@ -42,8 +42,6 @@ py cli.py run -m
 ![Example1](examples/image.png)
 
 
-<video src="examples\example2.mp4" width="80%" controls></video>
-
 ## Розподіл праці
 Основний алгоритм — [Софія Садовенко](https://github.com/sadovenkosofia) та [Іван Антоненко](https://github.com/FourShrimp2032);
 
