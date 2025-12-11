@@ -6,9 +6,9 @@ import random
 import numpy as np
 
 
-def reading_file_people(file_name: str) -> dict:
+def reading_file_people(file_name: str) -> dict[str: list[str]]:
     """
-    Функція зчитує файл і виводить словник, де ключ - ім'я людини, а значення- стать і хобі
+    Функція зчитує файл і виводить словник, де ключ - ім'я людини, а значення - стать і хобі
     """
     result_dict = {}
     with open(file_name, 'r', encoding='utf-8') as file:
@@ -299,7 +299,6 @@ def main(file_likes: str):
     if not users:
         print("У графі немає жодного користувача.")
         return
-
 
     liked_users = []
     disliked_users = []
