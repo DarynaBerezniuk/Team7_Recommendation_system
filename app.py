@@ -21,7 +21,7 @@ def load_css(filepath):
     with open(filepath) as f:
         st.html(f'<style>{f.read()}</style>')
 
-css_path = pathlib.Path(r'assets\style.css')
+css_path = pathlib.Path('assets/style.css')
 load_css(css_path)
 
 st.set_page_config(layout='wide')
@@ -74,13 +74,13 @@ def visualise_graph(graph: nx.DiGraph, pagerank_scores: dict[str: float]):
     for source, target in graph.edges():
         net.add_edge(source, target, arrows='to', color='gray')
 
-    temp_filename = r'assets\pyvis_temp_graph.html'
+    temp_filename = 'assets/pyvis_temp_graph.html'
     net.save_graph(temp_filename)
     with open(temp_filename, 'r', encoding='utf-8') as f:
         html_content = f.read()
     components.html(html_content, height=620)
 
-def pagerank_calculation(file_likes=r'data\likes.ini'):
+def pagerank_calculation(file_likes='data/likes.ini'):
     """
     Вираховує значення Pagerank для кожного ім'я, використовуючи
     фугкції з модуля pagerank_calculation.py, візуалізує граф та
@@ -150,7 +150,7 @@ def pagerank_calculation(file_likes=r'data\likes.ini'):
         st.session_state.current_candidate = remaining[0]
 
     st.subheader('Поточний кандидат')
-    st.write(pg.suggest_people(st.session_state.current_candidate, r'data\hobbies.ini'))
+    st.write(pg.suggest_people(st.session_state.current_candidate, 'data/hobbies.ini'))
 
     acted = False
     col1, col2 = st.columns(2)
