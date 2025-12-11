@@ -85,12 +85,15 @@ def pagerank_calculation(file_likes='Likes.ini'):
     if not users:
         st.warning('У графі немає жодного користувача.')
         return
-    
-    if 'liked' not in st.session_state: st.session_state.liked = []
-    if 'disliked' not in st.session_state: st.session_state.disliked = []
-    if 'asked' not in st.session_state: st.session_state.asked = []
+
+    if 'liked' not in st.session_state: 
+        st.session_state.liked = []
+    if 'disliked' not in st.session_state: 
+        st.session_state.disliked = []
+    if 'asked' not in st.session_state: 
+        st.session_state.asked = []
     if 'current_candidate' not in st.session_state:
-        st.session_state.current_candidate = 'name_18'  # same as console
+        st.session_state.current_candidate = random.choice(users)
 
     if len(st.session_state.asked) == len(users):
         st.success('Ми показали всі доступні профілі!')

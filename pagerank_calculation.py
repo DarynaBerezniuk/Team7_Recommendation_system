@@ -287,6 +287,21 @@ def suggest_people(user_name, file_name:str) -> dict:
 
     return f'Профіль: {user_name}, стать : {sex}, хобі: {', '.join(hobby)}'
 
+def write_pagerank_in_file(recommendations: list[tuple[str, float]]):
+    """
+    Динамічно записує значення PageRank для кожного кандидата у файл result.txt
+    
+    Аргументи:
+        recommendations list[tuple[str, float]]: список з кортежів,
+                                                 які репрезентують ім'я та
+                                                 pagerank значення
+
+    Зауваження: ця функція нічого не повертає, а записує у файл result.txt
+                отримані значення
+    """
+    with open('result.txt', 'w', encoding='utf-8') as f:
+        for (name, score) in recommendations:
+            f.write(f"{name}\t{score:.4f}\n")
 
 def main(file_likes: str):
     """
@@ -366,6 +381,16 @@ def main(file_likes: str):
 
         if not recommendations:
             break
+
+        recs_without_del = generate_recommendations(
+            users,
+            pageranks,
+            current_user=None,
+            liked_users=None,
+            disliked_users=None,
+            asked_users=None,
+        )
+        write_pagerank_in_file(recs_without_del)
 
         print("==========================================")
         for idx, (name, score) in enumerate(recommendations[:10], start=1):
