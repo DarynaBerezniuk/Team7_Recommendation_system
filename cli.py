@@ -18,7 +18,14 @@ parser_calc_pg.add_argument('-l', '--liked', metavar='', type=str, help='use it 
 parser_calc_pg.add_argument('-w', '--write', action='store_true', help='use it if you want \
                             to write the calculation results in a file called result.txt')
 
-parser_calc_pg = subparsers.add_parser('run', help='runs website to visualise algorithm')
+parser_run = subparsers.add_parser('run', help='runs either website to visualise algorithm \
+                                       or main code')
+group = parser_run.add_mutually_exclusive_group(required=True)
+group.add_argument('-web', '--website', action='store_true', help='use it if you want to run \
+                        website to visualise algorithm')
+group.add_argument('-m', '--module', action='store_true', help='use it if you want to run \
+                        code to visualise algorithm')
+
 args = parser.parse_args()
 
 def calc_pg(file_likes=r'data\likes.ini', liked=None, write=False):
@@ -76,4 +83,10 @@ if args.command == 'calc':
     else:
         calc_pg()
 elif args.command == 'run':
-    os.system('streamlit run app.py')
+    if args.website:
+        try:
+            os.system('streamlit run app.py')
+        except KeyboardInterrupt:
+            pass
+    elif args.module:
+        pg.main(r'data\likes.ini')

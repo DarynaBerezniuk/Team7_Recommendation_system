@@ -145,7 +145,7 @@ def pagerank_calculation(file_likes=r'data\likes.ini'):
                 st.markdown(disliked_output)
             else:
                 st.write('немає')
-                
+
             return
         st.session_state.current_candidate = remaining[0]
 
@@ -154,12 +154,12 @@ def pagerank_calculation(file_likes=r'data\likes.ini'):
 
     acted = False
     col1, col2 = st.columns(2)
-    if col1.button('Подобається'):
+    if col1.button('Подобається', shortcut='L'):
         if st.session_state.current_candidate not in st.session_state.liked:
             st.session_state.liked.append(st.session_state.current_candidate)
         st.session_state.asked.append(st.session_state.current_candidate)
         acted = True
-    if col2.button('Не подобається'):
+    if col2.button('Не подобається', shortcut='D'):
         if st.session_state.current_candidate not in st.session_state.disliked:
             st.session_state.disliked.append(st.session_state.current_candidate)
         st.session_state.asked.append(st.session_state.current_candidate)
