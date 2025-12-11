@@ -28,7 +28,7 @@ group.add_argument('-m', '--module', action='store_true', help='use it if you wa
 
 args = parser.parse_args()
 
-def calc_pg(file_likes=r'data\likes.ini', liked=None, write=False):
+def calc_pg(file_likes='data/likes.ini', liked=None, write=False):
     """
     Розраховує значення PageRank для кожної людини
     
