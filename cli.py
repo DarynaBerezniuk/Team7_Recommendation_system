@@ -69,7 +69,7 @@ def calc_pg(file_likes=r'data\likes.ini', liked=None, write=False):
             print(f"{name}\t{score:.4f}")
 
 if args.command == 'calc':
-    if args.l and args.w:
+    if args.liked and args.write:
         calc_pg(liked=args.liked, write=args.write)
     elif args.l:
         calc_pg(liked=args.liked)
