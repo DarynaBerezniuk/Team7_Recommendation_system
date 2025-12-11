@@ -71,7 +71,7 @@ def calc_pg(file_likes=r'data\likes.ini', liked=None, write=False):
 if args.command == 'calc':
     if args.liked and args.write:
         calc_pg(liked=args.liked, write=args.write)
-    elif args.l:
+    elif args.liked:
         calc_pg(liked=args.liked)
     else:
         calc_pg()
