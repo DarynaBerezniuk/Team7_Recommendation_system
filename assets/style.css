@@ -1,0 +1,40 @@
+@import url('https://fonts.googleapis.com/css2?family=Lobster&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Oswald:wght@200..700&display=swap');
+
+.stApp h1 {
+    font-family: 'Lobster';
+    font-weight: 100;
+    align-items: center;
+}
+
+html, body, .stApp h3, [class*='st'] {
+    font-family: 'Oswald';
+    color: #F7F1DE;
+}
+
+.stApp p {
+    text-align: center;
+    font-size: 25px;
+}
+
+.stApp Button {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    background-color: #C4A484;
+}
+
+.block-container {
+    display: flex;
+    align-items: baseline;
+    justify-content: flex-start;
+}
+
+.stApp {
+    background-color: #A8BBA3;
+}
+
+hr {
+    border:#FDACAC
+}

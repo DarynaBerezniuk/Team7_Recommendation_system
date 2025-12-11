@@ -4,11 +4,25 @@
 """
 
 import random
+import pathlib
 import streamlit as st
 import streamlit.components.v1 as components
 import networkx as nx
 from pyvis.network import Network
 import pagerank_calculation as pg
+
+def load_css(filepath):
+    """
+    Завантажує css файл
+
+    Аргументи:
+        filepath str: шлях до файлу з css
+    """
+    with open(filepath) as f:
+        st.html(f'<style>{f.read()}</style>')
+
+css_path = pathlib.Path(r'assets\style.css')
+load_css(css_path)
 
 st.set_page_config(layout='wide')
 st.title('Симулятор додатку для знайомств')
@@ -38,8 +52,8 @@ def visualise_graph(graph: nx.DiGraph, pagerank_scores: dict[str: float]):
 
     Зауважте: ця функція нічого не повертає, а візуалізує граф
     """
-    net = Network(height='600px', width='100%', bgcolor='#222222',
-                  font_color='white', directed=True, notebook=True)
+    net = Network(height='600px', width='100%', bgcolor='white',
+                  font_color='black', directed=True, notebook=True)
     net.toggle_physics(True)
 
     if not pagerank_scores:
@@ -55,18 +69,18 @@ def visualise_graph(graph: nx.DiGraph, pagerank_scores: dict[str: float]):
 
     for node, score in pagerank_scores.items():
         net.add_node(node, label=node, size=get_node_size(score),
-                     title=f'PageRank: {score:.4f}', color='#A0CBE2')
+                     title=f'PageRank: {score:.4f}', color='#A8BBA3')
 
     for source, target in graph.edges():
         net.add_edge(source, target, arrows='to', color='gray')
 
-    temp_filename = 'pyvis_temp_graph.html'
+    temp_filename = r'assets\pyvis_temp_graph.html'
     net.save_graph(temp_filename)
     with open(temp_filename, 'r', encoding='utf-8') as f:
         html_content = f.read()
     components.html(html_content, height=620)
 
-def pagerank_calculation(file_likes='Likes.ini'):
+def pagerank_calculation(file_likes=r'data\likes.ini'):
     """
     Вираховує значення Pagerank для кожного ім'я, використовуючи
     фугкції з модуля pagerank_calculation.py, візуалізує граф та
@@ -86,32 +100,57 @@ def pagerank_calculation(file_likes='Likes.ini'):
         st.warning('У графі немає жодного користувача.')
         return
 
-    if 'liked' not in st.session_state: 
+    if 'liked' not in st.session_state:
         st.session_state.liked = []
-    if 'disliked' not in st.session_state: 
+    if 'disliked' not in st.session_state:
         st.session_state.disliked = []
-    if 'asked' not in st.session_state: 
+    if 'asked' not in st.session_state:
         st.session_state.asked = []
     if 'current_candidate' not in st.session_state:
         st.session_state.current_candidate = random.choice(users)
 
     if len(st.session_state.asked) == len(users):
         st.success('Ми показали всі доступні профілі!')
-        st.write('Твої лайки:', st.session_state.liked or 'немає')
-        st.write('Твої дизлайки:', st.session_state.disliked or 'немає')
+        liked_users = st.session_state.liked
+        st.write('Твої лайки:')
+        if liked_users:
+            liked_output = "\n* " + "\n* ".join(liked_users)
+            st.markdown(liked_output)
+        else:
+            st.write('немає')
+        disliked_users = st.session_state.disliked
+        st.write('Твої дизлайки:')
+        if disliked_users:
+            disliked_output = "\n* " + "\n* ".join(disliked_users)
+            st.markdown(disliked_output)
+        else:
+            st.write('немає')
         return
 
     if st.session_state.current_candidate in st.session_state.asked:
         remaining = [u for u in users if u not in st.session_state.asked]
         if not remaining:
             st.success('Ми показали всі доступні профілі!')
-            st.write('Твої лайки:', st.session_state.liked or 'немає')
-            st.write('Твої дизлайки:', st.session_state.disliked or 'немає')
+            liked_users = st.session_state.liked
+            st.write('Твої лайки:')
+            if liked_users:
+                liked_output = "\n* " + "\n* ".join(liked_users)
+                st.markdown(liked_output)
+            else:
+                st.write('немає')
+            disliked_users = st.session_state.disliked
+            st.write('Твої дизлайки:')
+            if disliked_users:
+                disliked_output = "\n* " + "\n* ".join(disliked_users)
+                st.markdown(disliked_output)
+            else:
+                st.write('немає')
+                
             return
         st.session_state.current_candidate = remaining[0]
 
     st.subheader('Поточний кандидат')
-    st.write(pg.suggest_people(st.session_state.current_candidate, 'hobbies.ini'))
+    st.write(pg.suggest_people(st.session_state.current_candidate, r'data\hobbies.ini'))
 
     acted = False
     col1, col2 = st.columns(2)
@@ -130,8 +169,21 @@ def pagerank_calculation(file_likes='Likes.ini'):
         remaining = [u for u in users if u not in st.session_state.asked]
         if not remaining:
             st.success('Ми показали всі доступні профілі!')
-            st.write('Твої лайки:', st.session_state.liked or 'немає')
-            st.write('Твої дизлайки:', st.session_state.disliked or 'немає')
+            liked_users = st.session_state.liked
+            st.write('Твої лайки:')
+            if liked_users:
+                liked_output = "\n* " + "\n* ".join(liked_users)
+                st.markdown(liked_output)
+            else:
+                st.write('немає')
+
+            disliked_users = st.session_state.disliked
+            st.write('Твої дизлайки:')
+            if disliked_users:
+                disliked_output = "\n* " + "\n* ".join(disliked_users)
+                st.markdown(disliked_output)
+            else:
+                st.write('немає')
             return
         st.session_state.current_candidate = random.choice(remaining)
 
@@ -159,8 +211,20 @@ def pagerank_calculation(file_likes='Likes.ini'):
     if acted and (st.session_state.liked or st.session_state.disliked):
         if not recommendations:
             st.success('Ми показали всі доступні профілі!')
-            st.write('Твої лайки:', st.session_state.liked or 'немає')
-            st.write('Твої дизлайки:', st.session_state.disliked or 'немає')
+            liked_users = st.session_state.liked
+            st.write('Твої лайки:')
+            if liked_users:
+                liked_output = "\n* " + "\n* ".join(liked_users)
+                st.markdown(liked_output)
+            else:
+                st.write('немає')
+            disliked_users = st.session_state.disliked
+            st.write('Твої дизлайки:')
+            if disliked_users:
+                disliked_output = "\n* " + "\n* ".join(disliked_users)
+                st.markdown(disliked_output)
+            else:
+                st.write('немає')
             return
         next_candidates = [name for name, _ in recommendations \
                            if name not in st.session_state.asked]
@@ -169,6 +233,7 @@ def pagerank_calculation(file_likes='Likes.ini'):
         else:
             remaining = [u for u in users if u not in st.session_state.asked]
             st.session_state.current_candidate = remaining[0] if remaining else None
+        st.rerun()
     edges_data = [(src, tgt) for src, tgts in likes.items() for tgt in tgts]
 
     graph = create_graph(edges_data)

@@ -299,7 +299,7 @@ def write_pagerank_in_file(recommendations: list[tuple[str, float]]):
     Зауваження: ця функція нічого не повертає, а записує у файл result.txt
                 отримані значення
     """
-    with open('result.txt', 'w', encoding='utf-8') as f:
+    with open(r'output\result.txt', 'w', encoding='utf-8') as f:
         for (name, score) in recommendations:
             f.write(f"{name}\t{score:.4f}\n")
 
@@ -334,7 +334,7 @@ def main(file_likes: str):
             current_candidate = random.choice(remaining)
             continue
 
-        print(suggest_people(current_candidate, 'hobbies.ini'))
+        print(suggest_people(current_candidate, r'data\hobbies.ini'))
         ans = input("Подобається? [y/n/Enter щоб завершити]: ").strip().lower()
 
         if ans == "":
@@ -403,4 +403,4 @@ def main(file_likes: str):
 
 
 if __name__ == "__main__":
-    main("Likes.ini")
+    main(r"data\likes.ini")
