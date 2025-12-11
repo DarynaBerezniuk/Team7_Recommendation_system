@@ -320,7 +320,7 @@ def main(file_likes: str):
             current_candidate = random.choice(remaining)
             continue
 
-        print(suggest_people(current_candidate, 'File_1.ini'))
+        print(suggest_people(current_candidate, 'hobbies.ini'))
         ans = input("Подобається? [y/n/Enter щоб завершити]: ").strip().lower()
 
         if ans == "":
