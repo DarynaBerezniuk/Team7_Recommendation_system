@@ -512,4 +512,4 @@ def main(file_likes: str):
 if __name__ == "__main__":
     import doctest
     print(doctest.testmod())
-    main(r"data\likes.ini")
+    main("data/likes.ini")
