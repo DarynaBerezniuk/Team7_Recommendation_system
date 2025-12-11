@@ -89,4 +89,4 @@ elif args.command == 'run':
         except KeyboardInterrupt:
             pass
     elif args.module:
-        pg.main(r'data\likes.ini')
+        pg.main('data/likes.ini')
