@@ -1,19 +1,37 @@
+"""
+Команди для інтеракції з модулем pagerank_calculation через командний рядок
+"""
+
 import os
 import argparse
 import pagerank_calculation as pg
 
-parser = argparse.ArgumentParser(prog='pg', description='iehfhdhf')
+parser = argparse.ArgumentParser(prog='pg', description='Executes commands such as: \
+                                 ')
 subparsers = parser.add_subparsers(dest="command", required=True)
 
-parser_calc_pg = subparsers.add_parser('calc')
-parser_calc_pg.add_argument('--p', action='store_true')
-parser_calc_pg.add_argument('--l', type=str)
-parser_calc_pg.add_argument('--w', action='store_true')
+parser_calc_pg = subparsers.add_parser('calc', help='calculates PageRank with multiple \
+                                       conditions. Default: calculates PageRank without \
+                                       caring for liked or disliked people')
+parser_calc_pg.add_argument('-l', '--liked', metavar='', type=str, help='use it if you want to \
+                            calculate PageRank accordingly to the person you liked')
+parser_calc_pg.add_argument('-w', '--write', action='store_true', help='use it if you want \
+                            to write the calculation results in a file called result.txt')
 
-parser_calc_pg = subparsers.add_parser('run')
+parser_calc_pg = subparsers.add_parser('run', help='runs website to visualise algorithm')
 args = parser.parse_args()
 
 def calc_pg(file_likes=r'data\likes.ini', liked=None, write=False):
+    """
+    Розраховує значення PageRank для кожної людини
+    
+        file_likes str: шлях до файлу з візуалізацією ребер
+        liked str: ім'я людини, відносно якої треба порахувати PageRank
+        write bool: True, якщо треба записати функцію у файл
+
+    Зауваження: ця функція нічого не повертає, але записує у файл список людей
+                за рейтингом PageRank, або виводить цей список у термінал
+    """
     likes = pg.graph_creation(file_likes)
     users = pg.get_all_users(likes)
     matrix = pg.create_transition_matrix(likes, users)
@@ -51,11 +69,10 @@ def calc_pg(file_likes=r'data\likes.ini', liked=None, write=False):
             print(f"{name}\t{score:.4f}")
 
 if args.command == 'calc':
-
     if args.l and args.w:
-        calc_pg(liked=args.l, write=args.w)
+        calc_pg(liked=args.liked, write=args.write)
     elif args.l:
-        calc_pg(liked=args.l)
+        calc_pg(liked=args.liked)
     else:
         calc_pg()
 elif args.command == 'run':
