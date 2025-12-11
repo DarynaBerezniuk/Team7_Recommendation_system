@@ -41,9 +41,8 @@ py cli.py run -m
 ## Приклад виводу значень PageRank
 ![Example1](examples/image.png)
 
-<p align="center">
-  <video src="examples\example2.mp4" width="80%" controls></video>
-</p>
+
+<video src="examples\example2.mp4" width="80%" controls></video>
 
 ## Розподіл праці
 Основний алгоритм — [Софія Садовенко](https://github.com/sadovenkosofia) та [Іван Антоненко](https://github.com/FourShrimp2032);
